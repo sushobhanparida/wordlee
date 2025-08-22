@@ -63,7 +63,10 @@ app.get('/api/word-of-the-day', (req, res) => {
   const diff = istTime - startOfYear;
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
+  console.log('dayOfYear:', dayOfYear);
+  console.log('words.length:', words.length);
   const word = words[dayOfYear % words.length];
+  console.log('word:', word);
   res.json({ word });
 });
 
