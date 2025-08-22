@@ -13,7 +13,7 @@ const Game = ({ user }) => {
   useEffect(() => {
     if (isGameOver && user) {
       const gameStatus = guesses.includes(solution) ? 'won' : 'lost';
-      fetch('/api/webhook', {
+      fetch('https://wordlee-ldyx.onrender.com/api/webhook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

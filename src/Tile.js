@@ -20,5 +20,3 @@ const Tile = ({ value, status, style }) => {
 };
 
 export default Tile;
-
-export default Tile;

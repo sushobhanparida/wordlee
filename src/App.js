@@ -6,7 +6,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3001/auth/discord';
+    window.location.href = 'https://wordlee-ldyx.onrender.com/auth/discord';
   };
 
   useEffect(() => {
