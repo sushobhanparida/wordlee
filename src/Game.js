@@ -86,7 +86,7 @@ const Game = ({ user }) => {
   return (
     <div>
       <Board guesses={guesses} currentGuess={currentGuess} solution={solution} />
-      <Keyboard onKeyPress={handleKeyPress} />
+      <Keyboard onKeyPress={handleKeyPress} guesses={guesses} solution={solution} />
     </div>
   );
 };

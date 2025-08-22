@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const words = require('./words');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
