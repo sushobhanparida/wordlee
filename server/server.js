@@ -1,13 +1,18 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 const app = express();
 const port = 3001;
 
 app.use(express.json());
+app.use(cors({
+  origin: 'https://wordlee-beta.vercel.app',
+  credentials: true,
+}));
 
 app.get('/auth/discord', (req, res) => {
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent('http://localhost:3001/auth/discord/callback')}&response_type=code&scope=identify`;
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent('https://wordlee-ldyx.onrender.com/auth/discord/callback')}&response_type=code&scope=identify`;
   res.redirect(discordAuthUrl);
 });
 
@@ -21,7 +26,7 @@ app.get('/auth/discord/callback', async (req, res) => {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: 'http://localhost:3001/auth/discord/callback',
+        redirect_uri: 'https://wordlee-ldyx.onrender.com/auth/discord/callback',
       }), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +42,7 @@ app.get('/auth/discord/callback', async (req, res) => {
       });
 
       const user = userResponse.data;
-      res.redirect(`http://localhost:3000?username=${user.username}&avatar=${user.avatar}&id=${user.id}`);
+      res.redirect(`https://wordlee-beta.vercel.app/?username=${user.username}&avatar=${user.avatar}&id=${user.id}`);
     } catch (error) {
       console.error('Error with Discord OAuth2:', error);
       res.status(500).send('Error with Discord OAuth2');

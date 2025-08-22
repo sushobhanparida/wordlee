@@ -11,6 +11,10 @@ const Game = ({ user }) => {
   const [isGameOver, setIsGameOver] = useState(false);
 
   useEffect(() => {
+    setSolution(words[Math.floor(Math.random() * words.length)]);
+  }, []);
+
+  useEffect(() => {
     if (isGameOver && user) {
       const gameStatus = guesses.includes(solution) ? 'won' : 'lost';
       fetch('https://wordlee-ldyx.onrender.com/api/webhook', {

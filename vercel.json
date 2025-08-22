@@ -1,7 +1,0 @@
-{
-  "build": {
-    "env": {
-      "DISABLE_POSTCSS_CONFIG": "true"
-    }
-  }
-}
