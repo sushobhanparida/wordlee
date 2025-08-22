@@ -135,15 +135,7 @@ app.post('/api/save-game', (req, res) => {
     (game) => game.userId === userId && game.date === today
   );
 
-  let newGameState = { userId, date: today, solution, guesses, gameStatus };
-
-  if (existingGameIndex !== -1) {
-    // Update existing game, preserve webhookTriggered if it exists
-    newGameState = { ...gameStates[existingGameIndex], ...newGameState };
-  } else {
-    // Add new game, set webhookTriggered to false
-    newGameState.webhookTriggered = false;
-  }
+  const newGameState = { userId, date: today, solution, guesses, gameStatus };
 
   if (existingGameIndex !== -1) {
     gameStates[existingGameIndex] = newGameState; // Update existing game
@@ -157,56 +149,6 @@ app.post('/api/save-game', (req, res) => {
   } catch (error) {
     console.error('Error writing gameStates.json:', error);
     res.status(500).send('Error saving game state');
-  }
-});
-
-app.post('/api/trigger-webhook', async (req, res) => {
-  const { userId, gameStatus } = req.body;
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
-  const gameStatesPath = './gameStates.json';
-  let gameStates = [];
-  try {
-    const data = fs.readFileSync(gameStatesPath, 'utf8');
-    gameStates = JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading gameStates.json:', error);
-    return res.status(500).send('Error retrieving game state');
-  }
-
-  const existingGameIndex = gameStates.findIndex(
-    (game) => game.userId === userId && game.date === today
-  );
-
-  if (existingGameIndex !== -1) {
-    gameStates[existingGameIndex].webhookTriggered = true;
-    try {
-      fs.writeFileSync(gameStatesPath, JSON.stringify(gameStates, null, 2), 'utf8');
-      // Trigger Discord webhook
-      const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-      if (!webhookUrl) {
-        return res.status(500).send('Webhook URL not configured');
-      }
-
-      const embed = {
-        title: `Wordlee Game Over!`,
-        description: `${userId} just ${gameStatus} a game of Wordlee!`,
-        color: gameStatus === 'won' ? 65280 : 16711680, // Green for win, red for loss
-      };
-
-      try {
-        await axios.post(webhookUrl, { embeds: [embed] });
-        res.status(200).send('Webhook sent successfully');
-      } catch (error) {
-        console.error('Error sending webhook:', error);
-        res.status(500).send('Error sending webhook');
-      }
-    } catch (error) {
-      console.error('Error writing gameStates.json:', error);
-      res.status(500).send('Error saving game state');
-    }
-  } else {
-    res.status(404).send('No game state found for today');
   }
 });
 
