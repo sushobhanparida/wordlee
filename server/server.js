@@ -1,5 +1,7 @@
 require('dotenv').config();
+const fs = require('fs');
 const express = require('express');
+
 const words = require('./words');
 const axios = require('axios');
 const cors = require('cors');
@@ -56,6 +58,26 @@ app.get('/auth/discord/callback', async (req, res) => {
 
 
 app.get('/api/word-of-the-day', (req, res) => {
+  const { userId } = req.query;
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const gameStatesPath = './gameStates.json';
+  let gameStates = [];
+  try {
+    const data = fs.readFileSync(gameStatesPath, 'utf8');
+    gameStates = JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading gameStates.json:', error);
+  }
+
+  const gameState = gameStates.find(
+    (game) => game.userId === userId && game.date === today
+  );
+
+  if (gameState) {
+    return res.json({ word: gameState.solution, gameState });
+  }
+
   const now = new Date();
   const istOffset = 330; // 5.5 hours in minutes
   const istTime = new Date(now.getTime() + (istOffset * 60 * 1000));
@@ -63,10 +85,7 @@ app.get('/api/word-of-the-day', (req, res) => {
   const diff = istTime - startOfYear;
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  console.log('dayOfYear:', dayOfYear);
-  console.log('words.length:', words.length);
   const word = words[dayOfYear % words.length];
-  console.log('word:', word);
   res.json({ word });
 });
 
@@ -93,6 +112,65 @@ app.post('/api/webhook', async (req, res) => {
   } catch (error) {
     console.error('Error sending webhook:', error);
     res.status(500).send('Error sending webhook');
+  }
+});
+
+app.post('/api/save-game', (req, res) => {
+  const { userId, solution, guesses, gameStatus } = req.body;
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const gameStatesPath = './gameStates.json';
+  let gameStates = [];
+  try {
+    const data = fs.readFileSync(gameStatesPath, 'utf8');
+    gameStates = JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading gameStates.json:', error);
+  }
+
+  const existingGameIndex = gameStates.findIndex(
+    (game) => game.userId === userId && game.date === today
+  );
+
+  const newGameState = { userId, date: today, solution, guesses, gameStatus };
+
+  if (existingGameIndex !== -1) {
+    gameStates[existingGameIndex] = newGameState; // Update existing game
+  } else {
+    gameStates.push(newGameState); // Add new game
+  }
+
+  try {
+    fs.writeFileSync(gameStatesPath, JSON.stringify(gameStates, null, 2), 'utf8');
+    res.status(200).send('Game state saved successfully');
+  } catch (error) {
+    console.error('Error writing gameStates.json:', error);
+    res.status(500).send('Error saving game state');
+  }
+});
+
+app.get('/api/game-state', (req, res) => {
+  const { userId } = req.query;
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const gameStatesPath = './gameStates.json';
+  let gameStates = [];
+  try {
+    const data = fs.readFileSync(gameStatesPath, 'utf8');
+    gameStates = JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading gameStates.json:', error);
+    return res.status(500).send('Error retrieving game state');
+  }
+
+  const gameState = gameStates.find(
+    (game) => game.userId === userId && game.date === today
+  );
+
+  if (gameState) {
+    res.json(gameState);
+  } else {
+    res.status(404).send('No game state found for today');
   }
 });
 

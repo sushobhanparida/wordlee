@@ -1,6 +1,7 @@
 import './App.css';
 import Game from './Game';
 import React, { useState, useEffect } from 'react';
+import LandingPage from './LandingPage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -10,13 +11,22 @@ function App() {
   };
 
   useEffect(() => {
+    const storedUser = localStorage.getItem('wordleeUser');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
     const avatar = urlParams.get('avatar');
     const id = urlParams.get('id');
 
     if (username && id) {
-      setUser({ username, avatar, id });
+      const newUser = { username, avatar, id };
+      setUser(newUser);
+      localStorage.setItem('wordleeUser', JSON.stringify(newUser));
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
@@ -24,11 +34,13 @@ function App() {
     <div className="App">
       <h1>Wordlee</h1>
       {user ? (
-        <p>Welcome, {user.username}!</p>
+        <>
+          <p>Welcome, {user.username}!</p>
+          <Game user={user} />
+        </>
       ) : (
-        <button onClick={handleLogin}>Login with Discord</button>
+        <LandingPage onLogin={handleLogin} />
       )}
-      <Game user={user} />
     </div>
   );
 }

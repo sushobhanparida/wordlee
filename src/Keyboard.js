@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Keyboard = ({ onKeyPress, guesses, solution }) => {
+const Keyboard = ({ onKeyPress, guesses, solution, isGameOver }) => {
   const keys1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
   const keys2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
   const keys3 = ['Enter', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'Backspace'];
@@ -32,13 +32,13 @@ const Keyboard = ({ onKeyPress, guesses, solution }) => {
   return (
     <div className="keyboard">
       <div className="keyboard-row">
-        {keys1.map(key => <button key={key} className={keyStatus[key]} onClick={() => onKeyPress(key)}>{key}</button>)}
+        {keys1.map(key => <button key={key} className={keyStatus[key]} onClick={() => !isGameOver && onKeyPress(key)} disabled={isGameOver}>{key}</button>)}
       </div>
       <div className="keyboard-row">
-        {keys2.map(key => <button key={key} className={keyStatus[key]} onClick={() => onKeyPress(key)}>{key}</button>)}
+        {keys2.map(key => <button key={key} className={keyStatus[key]} onClick={() => !isGameOver && onKeyPress(key)} disabled={isGameOver}>{key}</button>)}
       </div>
       <div className="keyboard-row">
-        {keys3.map(key => <button key={key} className={keyStatus[key]} onClick={() => onKeyPress(key)}>{key}</button>)}
+        {keys3.map(key => <button key={key} className={keyStatus[key]} onClick={() => !isGameOver && onKeyPress(key)} disabled={isGameOver}>{key}</button>)}
       </div>
     </div>
   );

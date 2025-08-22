@@ -11,12 +11,26 @@ const Game = ({ user }) => {
   const [isGameOver, setIsGameOver] = useState(false);
 
     useEffect(() => {
-    fetch('https://wordlee-ldyx.onrender.com/api/word-of-the-day')
+    if (!user) return; // Don't fetch game state if user is not logged in
+
+    fetch(`https://wordlee-ldyx.onrender.com/api/word-of-the-day?userId=${user.id}`)
       .then(res => res.json())
       .then(data => {
-        setSolution(data.word);
-      });
-  }, []);
+        if (data.gameState) {
+          // Load saved game state
+          setSolution(data.gameState.solution);
+          setGuesses(data.gameState.guesses);
+          setIsGameOver(true); // Game is already over for today
+        } else {
+          // Start a new game
+          setSolution(data.word);
+          setGuesses(Array(6).fill(null));
+          setCurrentGuess('');
+          setIsGameOver(false);
+        }
+      })
+      .catch(error => console.error('Error fetching word of the day or game state:', error));
+  }, [user]); // Depend on user to refetch when user logs in
 
   const handleKeyPress = (key) => {
     if (isGameOver) return;
@@ -83,10 +97,26 @@ const Game = ({ user }) => {
     }
   }, [isGameOver, user, solution, guesses]);
 
+  useEffect(() => {
+    if (isGameOver && user) {
+      const gameStatus = guesses.includes(solution) ? 'won' : 'lost';
+      fetch('https://wordlee-ldyx.onrender.com/api/save-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id, solution, guesses, gameStatus }),
+      })
+        .then(res => res.text())
+        .then(message => console.log(message))
+        .catch(error => console.error('Error saving game state:', error));
+    }
+  }, [isGameOver, user, solution, guesses]);
+
   return (
     <div>
       <Board guesses={guesses} currentGuess={currentGuess} solution={solution} />
-      <Keyboard onKeyPress={handleKeyPress} guesses={guesses} solution={solution} />
+      <Keyboard onKeyPress={handleKeyPress} guesses={guesses} solution={solution} isGameOver={isGameOver} />
     </div>
   );
 };
