@@ -1,29 +1,16 @@
-# Wordlee
+# Wordlee 🎮
 
-Wordlee is a daily word guessing game inspired by Wordle, built with React for the frontend and Node.js for the backend. Challenge yourself to guess the 6-letter word of the day!
+Wordlee is a daily word guessing game inspired by Wordle, built with React for the frontend and Node.js for the backend. Challenge yourself to guess the 6-letter word of the day! 🚀
 
-## How it Works
+## How to Play 🕹️
 
-Each day, a new 6-letter word is chosen. You have 6 attempts to guess the word. After each guess, you receive feedback on your letters:
+1.  **Login:** Access the game and log in using your Discord account. 🔑
+2.  **Guess:** Type your 6-letter guess using the on-screen keyboard or your physical keyboard. ⌨️
+3.  **Submit:** Press "Enter" to submit your guess. ⏎
+4.  **Feedback:** Observe the color-coded feedback on the tiles and the on-screen keyboard to refine your next guess. 💡
+5.  **Win or Lose:** Guess the word within 6 attempts to win, or run out of guesses to lose. 🎉/😭
 
-*   **Green:** The letter is in the word and in the correct position.
-*   **Yellow:** The letter is in the word but in the wrong position.
-*   **Grey:** The letter is not in the word at all.
-
-The game also features:
-*   **Discord Integration:** Log in with your Discord account to play.
-*   **Webhook Notifications:** Get a rich Discord notification when you complete a game (win or lose).
-*   **Game State Persistence:** Your game progress is saved daily, so you can continue where you left off.
-
-## How to Play
-
-1.  **Login:** Access the game and log in using your Discord account.
-2.  **Guess:** Type your 6-letter guess using the on-screen keyboard or your physical keyboard.
-3.  **Submit:** Press "Enter" to submit your guess.
-4.  **Feedback:** Observe the color-coded feedback on the tiles and the on-screen keyboard to refine your next guess.
-5.  **Win or Lose:** Guess the word within 6 attempts to win, or run out of guesses to lose.
-
-## Development
+## Development 🧑‍💻
 
 To run the project locally:
 
@@ -59,11 +46,11 @@ To run the project locally:
     ```
     This will start both the React frontend and the Node.js backend.
 
-## Deployment
+## Deployment 🌐
 
 The frontend is deployed on Vercel and the backend on Render.com. Automatic deployments are triggered on `git push` to the `master` branch.
 
-## Technologies Used
+## Technologies Used 🛠️
 
 *   **Frontend:** React, HTML, CSS
 *   **Backend:** Node.js, Express.js
@@ -72,6 +59,13 @@ The frontend is deployed on Vercel and the backend on Render.com. Automatic depl
 *   **Notifications:** Discord Webhooks
 *   **Word Validation:** dictionaryapi.dev
 
+## Features to be Added 💡
+
+1.  Fluid animations while guessing words. ✨
+2.  Add an extra guess row if user has guessed 5 letters already (may not be in the right place). ➕
+3.  Richer Discord notifications. 🔔
+4.  UI beautification all over. 🎨
+
 ---
 
-Enjoy playing Wordlee!
+Enjoy playing Wordlee! 😄
