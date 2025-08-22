@@ -1,5 +1,5 @@
-import './App.css';
 import Game from './Game';
+import LandingPage from './LandingPage';
 import React, { useState, useEffect } from 'react';
 
 function App() {
@@ -21,14 +21,16 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <h1>Wordlee</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white font-sans">
       {user ? (
-        <p>Welcome, {user.username}!</p>
+        <>
+          <h1 className="text-4xl font-bold mb-8">Wordlee</h1>
+          <p className="text-lg mb-4">Welcome, {user.username}!</p>
+          <Game user={user} />
+        </>
       ) : (
-        <button onClick={handleLogin}>Login with Discord</button>
+        <LandingPage onLogin={handleLogin} />
       )}
-      <Game user={user} />
     </div>
   );
 }

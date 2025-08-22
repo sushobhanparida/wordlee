@@ -20,7 +20,7 @@ const Row = ({ guess, solution, isSubmitted, isWinner }) => {
     tiles.push(<Tile key={i} value={char} status={status} style={{ '--i': i }} />);
   }
 
-  const className = `row ${isWinner ? 'winner' : ''}`;
+  const className = `grid grid-cols-6 gap-1 ${isWinner ? 'winner' : ''}`;
 
   return <div className={className}>{tiles}</div>;
 };
