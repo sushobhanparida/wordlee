@@ -86,6 +86,9 @@ app.get('/api/word-of-the-day', (req, res) => {
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
   const word = words[dayOfYear % words.length];
+  if (word.length !== 6) {
+    console.warn(`Word of the day "${word}" is not 6 letters long.`);
+  }
   res.json({ word });
 });
 
