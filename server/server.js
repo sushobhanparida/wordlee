@@ -42,7 +42,7 @@ app.get('/auth/discord/callback', async (req, res) => {
       });
 
       const user = userResponse.data;
-      res.redirect(`https://wordlee-beta.vercel.app/?username=${user.username}&avatar=${user.avatar}&id=${user.id}`);
+            res.redirect(`https://wordlee-beta.vercel.app/?username=${user.username}&avatar=${user.avatar}&id=${user.id}`);
     } catch (error) {
       console.error('Error with Discord OAuth2:', error);
       res.status(500).send('Error with Discord OAuth2');
