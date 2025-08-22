@@ -9,6 +9,7 @@ const Game = ({ user }) => {
   const [guesses, setGuesses] = useState(Array(6).fill(null));
   const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameEndedThisSession, setGameEndedThisSession] = useState(false);
 
     useEffect(() => {
     if (!user) return; // Don't fetch game state if user is not logged in
@@ -55,9 +56,11 @@ const Game = ({ user }) => {
 
               if (currentGuess === solution) {
                 setIsGameOver(true);
+                setGameEndedThisSession(true);
                 alert('You won!');
               } else if (guessIndex === 5) {
                 setIsGameOver(true);
+                setGameEndedThisSession(true);
                 alert(`You lost! The word was ${solution}`);
               }
             } else {
@@ -85,17 +88,30 @@ const Game = ({ user }) => {
   }, [handleKeyPress]);
 
   useEffect(() => {
-    if (isGameOver && user) {
+    if (gameEndedThisSession && user) {
       const gameStatus = guesses.includes(solution) ? 'won' : 'lost';
-      fetch('https://wordlee-ldyx.onrender.com/api/webhook', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ gameStatus, user }),
-      });
+
+      // Fetch current game state to check webhookTriggered status
+      fetch(`https://wordlee-ldyx.onrender.com/api/game-state?userId=${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.webhookTriggered) {
+            // Trigger webhook only if it hasn't been triggered for today
+            fetch('https://wordlee-ldyx.onrender.com/api/trigger-webhook', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ userId: user.id, gameStatus, user }),
+            })
+              .then(res => res.text())
+              .then(message => console.log(message))
+              .catch(error => console.error('Error triggering webhook:', error));
+          }
+        })
+        .catch(error => console.error('Error fetching game state for webhook check:', error));
     }
-  }, [isGameOver, user, solution, guesses]);
+  }, [gameEndedThisSession, user, solution, guesses]);
 
   useEffect(() => {
     if (isGameOver && user) {
