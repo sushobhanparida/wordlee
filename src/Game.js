@@ -87,13 +87,26 @@ const Game = ({ user }) => {
   useEffect(() => {
     if (isGameOver && user) {
       const gameStatus = guesses.includes(solution) ? 'won' : 'lost';
-      fetch('https://wordlee-ldyx.onrender.com/api/webhook', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ gameStatus, user }),
-      });
+
+      // Fetch current game state to check webhookTriggered status
+      fetch(`https://wordlee-ldyx.onrender.com/api/game-state?userId=${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.webhookTriggered) {
+            // Trigger webhook only if it hasn't been triggered for today
+            fetch('https://wordlee-ldyx.onrender.com/api/trigger-webhook', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ userId: user.id, gameStatus, user }),
+            })
+              .then(res => res.text())
+              .then(message => console.log(message))
+              .catch(error => console.error('Error triggering webhook:', error));
+          }
+        })
+        .catch(error => console.error('Error fetching game state for webhook check:', error));
     }
   }, [isGameOver, user, solution, guesses]);
 
