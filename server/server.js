@@ -85,7 +85,21 @@ app.get('/api/word-of-the-day', (req, res) => {
   const diff = istTime - startOfYear;
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  const word = words[dayOfYear % words.length];
+  let word = '';
+  let attempts = 0;
+  const maxAttempts = 100; // Prevent infinite loops
+
+  do {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    word = words[randomIndex];
+    attempts++;
+  } while (word.length !== 6 && attempts < maxAttempts);
+
+  if (word.length !== 6) {
+    console.error('Could not find a 6-letter word after multiple attempts.');
+    // Fallback to a default 6-letter word if necessary
+    word = 'random'; // Or handle this error appropriately
+  }
   res.json({ word });
 });
 
