@@ -1,70 +1,77 @@
-# Getting Started with Create React App
+# Wordlee
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Wordlee is a daily word guessing game inspired by Wordle, built with React for the frontend and Node.js for the backend. Challenge yourself to guess the 6-letter word of the day!
 
-## Available Scripts
+## How it Works
 
-In the project directory, you can run:
+Each day, a new 6-letter word is chosen. You have 6 attempts to guess the word. After each guess, you receive feedback on your letters:
 
-### `npm start`
+*   **Green:** The letter is in the word and in the correct position.
+*   **Yellow:** The letter is in the word but in the wrong position.
+*   **Grey:** The letter is not in the word at all.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The game also features:
+*   **Discord Integration:** Log in with your Discord account to play.
+*   **Webhook Notifications:** Get a rich Discord notification when you complete a game (win or lose).
+*   **Game State Persistence:** Your game progress is saved daily, so you can continue where you left off.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## How to Play
 
-### `npm test`
+1.  **Login:** Access the game and log in using your Discord account.
+2.  **Guess:** Type your 6-letter guess using the on-screen keyboard or your physical keyboard.
+3.  **Submit:** Press "Enter" to submit your guess.
+4.  **Feedback:** Observe the color-coded feedback on the tiles and the on-screen keyboard to refine your next guess.
+5.  **Win or Lose:** Guess the word within 6 attempts to win, or run out of guesses to lose.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Development
 
-### `npm run build`
+To run the project locally:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/sushobhanparida/wordlee.git
+    cd wordlee
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2.  **Install frontend dependencies:**
+    ```bash
+    npm install
+    ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3.  **Install backend dependencies:**
+    ```bash
+    cd server
+    npm install
+    cd ..
+    ```
 
-### `npm run eject`
+4.  **Set up environment variables:**
+    Create a `.env` file in the `server` directory with your Discord API credentials and webhook URL:
+    ```
+    DISCORD_CLIENT_ID=your_discord_client_id
+    DISCORD_CLIENT_SECRET=your_discord_client_secret
+    DISCORD_WEBHOOK_URL=your_discord_webhook_url
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5.  **Start the application:**
+    ```bash
+    npm start
+    ```
+    This will start both the React frontend and the Node.js backend.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Deployment
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The frontend is deployed on Vercel and the backend on Render.com. Automatic deployments are triggered on `git push` to the `master` branch.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Technologies Used
 
-## Learn More
+*   **Frontend:** React, HTML, CSS
+*   **Backend:** Node.js, Express.js
+*   **Database:** `gameStates.json` (for game state persistence)
+*   **Authentication:** Discord OAuth2
+*   **Notifications:** Discord Webhooks
+*   **Word Validation:** dictionaryapi.dev
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Enjoy playing Wordlee!
