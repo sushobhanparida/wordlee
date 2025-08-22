@@ -52,6 +52,20 @@ app.get('/auth/discord/callback', async (req, res) => {
   }
 });
 
+
+
+app.get('/api/word-of-the-day', (req, res) => {
+  const now = new Date();
+  const istOffset = 330; // 5.5 hours in minutes
+  const istTime = new Date(now.getTime() + (istOffset * 60 * 1000));
+  const startOfYear = new Date(istTime.getFullYear(), 0, 0);
+  const diff = istTime - startOfYear;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  const word = words[dayOfYear % words.length];
+  res.json({ word });
+});
+
 app.post('/api/webhook', async (req, res) => {
   const { gameStatus, user } = req.body;
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
@@ -75,6 +89,25 @@ app.post('/api/webhook', async (req, res) => {
   } catch (error) {
     console.error('Error sending webhook:', error);
     res.status(500).send('Error sending webhook');
+  }
+});
+
+app.post('/api/validate-word', async (req, res) => {
+  const { word } = req.body;
+  try {
+    const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    if (response.status === 200) {
+      res.json({ valid: true });
+    } else {
+      res.json({ valid: false });
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      res.json({ valid: false });
+    } else {
+      console.error('Error validating word:', error);
+      res.status(500).send('Error validating word');
+    }
   }
 });
 
