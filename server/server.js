@@ -185,8 +185,8 @@ app.post('/api/webhook', async (req, res) => {
   }
 });
 
-app.post('/api/save-game', (req, res) => {
-  const { userId, solution, guesses, gameStatus } = req.body;
+app.post('/api/trigger-webhook', async (req, res) => {
+  const { userId, gameStatus, user } = req.body;
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
   const gameStatesPath = './gameStates.json';
@@ -196,34 +196,45 @@ app.post('/api/save-game', (req, res) => {
     gameStates = JSON.parse(data);
   } catch (error) {
     console.error('Error reading gameStates.json:', error);
+    return res.status(500).send('Error retrieving game state');
   }
 
   const existingGameIndex = gameStates.findIndex(
     (game) => game.userId === userId && game.date === today
   );
 
-  let newGameState = { userId, date: today, solution, guesses, gameStatus };
-
   if (existingGameIndex !== -1) {
-    // Update existing game, preserve webhookTriggered if it exists
-    newGameState = { ...gameStates[existingGameIndex], ...newGameState };
-  } else {
-    // Add new game, set webhookTriggered to false
-    newGameState.webhookTriggered = false;
-  }
+    gameStates[existingGameIndex].webhookTriggered = true;
+    try {
+      fs.writeFileSync(gameStatesPath, JSON.stringify(gameStates, null, 2), 'utf8');
+      // Trigger Discord webhook
+      const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+      if (!webhookUrl) {
+        return res.status(500).send('Webhook URL not configured');
+      }
 
-  if (existingGameIndex !== -1) {
-    gameStates[existingGameIndex] = newGameState; // Update existing game
-  } else {
-    gameStates.push(newGameState); // Add new game
-  }
+      const embed = {
+        title: `Wordlee Game Over!`,
+        description: `${user.username} just ${gameStatus} a game of Wordlee!`,
+        color: gameStatus === 'won' ? 65280 : 16711680, // Green for win, red for loss
+        thumbnail: {
+          url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
+        },
+      };
 
-  try {
-    fs.writeFileSync(gameStatesPath, JSON.stringify(gameStates, null, 2), 'utf8');
-    res.status(200).send('Game state saved successfully');
-  } catch (error) {
-    console.error('Error writing gameStates.json:', error);
-    res.status(500).send('Error saving game state');
+      try {
+        await axios.post(webhookUrl, { embeds: [embed] });
+        res.status(200).send('Webhook sent successfully');
+      } catch (error) {
+        console.error('Error sending webhook:', error);
+        res.status(500).send('Error sending webhook');
+      }
+    } catch (error) {
+      console.error('Error writing gameStates.json:', error);
+      res.status(500).send('Error saving game state');
+    }
+  } else {
+    res.status(404).send('No game state found for today');
   }
 });
 
