@@ -8,6 +8,34 @@ const cors = require('cors');
 const app = express();
 const port = 3001;
 
+// Simple seeded random number generator (consistent for a given seed)
+function mulberry32(a) {
+    return function() {
+      var t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t = t ^ t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+// Fisher-Yates (Knuth) shuffle with a seed
+function seededShuffle(array, seed) {
+    let currentIndex = array.length, randomIndex;
+    const random = mulberry32(seed); // Get a seeded random function
+
+    // While there remain elements to shuffle.
+    while (currentIndex !== 0) {
+        // Pick a remaining element.
+        randomIndex = Math.floor(random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
 app.use(express.json());
 app.use(cors({
   origin: 'https://wordlee-beta.vercel.app',
@@ -95,13 +123,15 @@ app.get('/api/word-of-the-day', (req, res) => {
     console.error('Error reading usedWords.json:', error);
   }
 
+  const shuffledWords = seededShuffle(words.slice(), dayOfYear); // Shuffle words based on dayOfYear
+
   let word = '';
   let foundWord = false;
-  let startIndex = dayOfYear % words.length;
+  let startIndex = dayOfYear % shuffledWords.length;
 
-  for (let i = 0; i < words.length; i++) {
-    const currentIndex = (startIndex + i) % words.length;
-    const candidateWord = words[currentIndex];
+  for (let i = 0; i < shuffledWords.length; i++) {
+    const currentIndex = (startIndex + i) % shuffledWords.length;
+    const candidateWord = shuffledWords[currentIndex];
 
     if (candidateWord.length === 6 && !usedWords.includes(candidateWord)) {
       word = candidateWord;
