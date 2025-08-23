@@ -1,13 +1,13 @@
 import React from 'react';
 import Row from './Row';
 
-const Board = ({ guesses, currentGuess, solution }) => {
+const Board = ({ guesses, currentGuess, solution, shakeRow }) => {
   return (
     <div className="board">
       {guesses.map((guess, i) => {
         const isCurrentGuess = i === guesses.findIndex(val => val === null);
         const isWinner = guess === solution;
-        return <Row key={i} guess={isCurrentGuess ? currentGuess : guess ?? ''} solution={solution} isSubmitted={!isCurrentGuess && guess !== null} isWinner={isWinner} />;
+        return <Row key={i} guess={isCurrentGuess ? currentGuess : guess ?? ''} solution={solution} isSubmitted={!isCurrentGuess && guess !== null} isWinner={isWinner} shake={isCurrentGuess && shakeRow} />;
       })}
     </div>
   );

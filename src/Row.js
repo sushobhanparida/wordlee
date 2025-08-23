@@ -1,7 +1,7 @@
 import React from 'react';
 import Tile from './Tile';
 
-const Row = ({ guess, solution, isSubmitted, isWinner }) => {
+const Row = ({ guess, solution, isSubmitted, isWinner, shake }) => {
   const tiles = [];
   for (let i = 0; i < 6; i++) {
     const char = guess[i];
@@ -20,7 +20,7 @@ const Row = ({ guess, solution, isSubmitted, isWinner }) => {
     tiles.push(<Tile key={i} value={char} status={status} style={{ '--i': i }} />);
   }
 
-  const className = `row ${isWinner ? 'winner' : ''}`;
+  const className = `row ${isWinner ? 'winner' : ''} ${shake ? 'shake' : ''}`;
 
   return <div className={className}>{tiles}</div>;
 };

@@ -202,7 +202,15 @@ app.post('/api/save-game', (req, res) => {
     (game) => game.userId === userId && game.date === today
   );
 
-  const newGameState = { userId, date: today, solution, guesses, gameStatus };
+  let newGameState = { userId, date: today, solution, guesses, gameStatus };
+
+  if (existingGameIndex !== -1) {
+    // Update existing game, preserve webhookTriggered if it exists
+    newGameState = { ...gameStates[existingGameIndex], ...newGameState };
+  } else {
+    // Add new game, set webhookTriggered to false
+    newGameState.webhookTriggered = false;
+  }
 
   if (existingGameIndex !== -1) {
     gameStates[existingGameIndex] = newGameState; // Update existing game

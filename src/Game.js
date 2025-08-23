@@ -10,6 +10,7 @@ const Game = ({ user }) => {
   const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameEndedThisSession, setGameEndedThisSession] = useState(false);
+  const [shakeRow, setShakeRow] = useState(false);
 
     useEffect(() => {
     if (!user) return; // Don't fetch game state if user is not logged in
@@ -65,6 +66,8 @@ const Game = ({ user }) => {
               }
             } else {
               console.log('Invalid word');
+              setShakeRow(true);
+              setTimeout(() => setShakeRow(false), 500); // Reset shake after 500ms
             }
           });
       }
@@ -131,7 +134,7 @@ const Game = ({ user }) => {
 
   return (
     <div>
-      <Board guesses={guesses} currentGuess={currentGuess} solution={solution} />
+      <Board guesses={guesses} currentGuess={currentGuess} solution={solution} shakeRow={shakeRow} />
       <Keyboard onKeyPress={handleKeyPress} guesses={guesses} solution={solution} isGameOver={isGameOver} />
     </div>
   );
