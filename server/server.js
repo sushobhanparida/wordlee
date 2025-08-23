@@ -95,12 +95,6 @@ app.get('/api/word-of-the-day', (req, res) => {
     console.error('Error reading usedWords.json:', error);
   }
 
-  // Reset used words every 30 days
-  if (dayOfYear % 30 === 0 && usedWords.length > 0) {
-    usedWords = [];
-    console.log('30-day cycle complete. Resetting used words.');
-  }
-
   let word = '';
   let foundWord = false;
   let startIndex = dayOfYear % words.length;
@@ -117,19 +111,10 @@ app.get('/api/word-of-the-day', (req, res) => {
   }
 
   if (!foundWord) {
-    // All 6-letter words have been used, reset the cycle
-    usedWords = [];
-    console.log('All 6-letter words used. Resetting word cycle.');
-    // Try to find a word again from the beginning of the list
-    for (let i = 0; i < words.length; i++) {
-      const currentIndex = (startIndex + i) % words.length;
-      const candidateWord = words[currentIndex];
-      if (candidateWord.length === 6) { // Only check length, not if used, as usedWords is reset
-        word = candidateWord;
-        foundWord = true;
-        break;
-      }
-    }
+    // All 6-letter words have been used, and usedWords is not cleared automatically.
+    // The game will now fall back to a default word.
+    console.error('All 6-letter words used. Falling back to default word.');
+    word = 'random'; // Fallback if no 6-letter words exist at all
   }
 
   if (foundWord) {
@@ -139,9 +124,6 @@ app.get('/api/word-of-the-day', (req, res) => {
     } catch (error) {
       console.error('Error writing usedWords.json:', error);
     }
-  } else {
-    console.error('Could not find any 6-letter word in the dictionary.');
-    word = 'random'; // Fallback if no 6-letter words exist at all
   }
 
   res.json({ word });
