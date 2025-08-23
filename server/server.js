@@ -85,22 +85,65 @@ app.get('/api/word-of-the-day', (req, res) => {
   const diff = istTime - startOfYear;
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  let word = words[dayOfYear % words.length];
-  if (word.length !== 6) {
-    console.error(`Word of the day "${word}" is not 6 letters long. Attempting to find a 6-letter word.`);
-    let attempts = 0;
-    const maxAttempts = 100; // Prevent infinite loops
-    do {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      word = words[randomIndex];
-      attempts++;
-    } while (word.length !== 6 && attempts < maxAttempts);
 
-    if (word.length !== 6) {
-      console.error('Could not find a 6-letter word after multiple attempts. Falling back to default.');
-      word = 'random'; // Fallback
+  const usedWordsPath = './usedWords.json';
+  let usedWords = [];
+  try {
+    const data = fs.readFileSync(usedWordsPath, 'utf8');
+    usedWords = JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading usedWords.json:', error);
+  }
+
+  // Reset used words every 30 days
+  if (dayOfYear % 30 === 0 && usedWords.length > 0) {
+    usedWords = [];
+    console.log('30-day cycle complete. Resetting used words.');
+  }
+
+  let word = '';
+  let foundWord = false;
+  let startIndex = dayOfYear % words.length;
+
+  for (let i = 0; i < words.length; i++) {
+    const currentIndex = (startIndex + i) % words.length;
+    const candidateWord = words[currentIndex];
+
+    if (candidateWord.length === 6 && !usedWords.includes(candidateWord)) {
+      word = candidateWord;
+      foundWord = true;
+      break;
     }
   }
+
+  if (!foundWord) {
+    // All 6-letter words have been used, reset the cycle
+    usedWords = [];
+    console.log('All 6-letter words used. Resetting word cycle.');
+    // Try to find a word again from the beginning of the list
+    for (let i = 0; i < words.length; i++) {
+      const currentIndex = (startIndex + i) % words.length;
+      const candidateWord = words[currentIndex];
+      if (candidateWord.length === 6) { // Only check length, not if used, as usedWords is reset
+        word = candidateWord;
+        foundWord = true;
+        break;
+      }
+    }
+  }
+
+  if (foundWord) {
+    usedWords.push(word);
+    try {
+      fs.writeFileSync(usedWordsPath, JSON.stringify(usedWords, null, 2), 'utf8');
+    } catch (error) {
+      console.error('Error writing usedWords.json:', error);
+    }
+  } else {
+    console.error('Could not find any 6-letter word in the dictionary.');
+    word = 'random'; // Fallback if no 6-letter words exist at all
+  }
+
   res.json({ word });
 });
 
